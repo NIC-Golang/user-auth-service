@@ -11,4 +11,4 @@ User authentication and authorization microservice for the e-commerce platform. 
 
 **1. Copy .env.example file to your .env**
 
-**2. In your cli enter: *git clone https://github.com/username/repository.git***
+**2. In your cli enter: *git clone https://github.com/NIC-Golang/user-auth-service.git***
