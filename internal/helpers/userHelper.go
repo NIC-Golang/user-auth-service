@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"context"
-	"go/auth-service/internal/config"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -42,8 +41,6 @@ type User struct {
 	Name  string `json:"name"`
 }
 
-var userCollect *mongo.Collection = config.GetCollection(config.DB, "users")
-
 func TakeName() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user User
@@ -53,7 +50,7 @@ func TakeName() gin.HandlerFunc {
 			return
 		}
 		var foundUser User
-		err = userCollect.FindOne(context.Background(), bson.M{"email": user.Email}).Decode(&foundUser)
+		err = userCollection.FindOne(context.Background(), bson.M{"email": user.Email}).Decode(&foundUser)
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
 				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})

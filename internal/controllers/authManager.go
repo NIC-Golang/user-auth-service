@@ -20,11 +20,14 @@ import (
 )
 
 var userCollection *mongo.Collection = config.GetCollection(config.DB, "users")
+
+const timeoutDuration = 10 * time.Second
+
 var validate = validator.New()
 
 func SignUp() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+		ctx, cancel := context.WithTimeout(context.Background(), timeoutDuration)
 		defer cancel()
 		var user models.User
 
@@ -89,7 +92,7 @@ func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user models.User
 		var foundUser models.User
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+		ctx, cancel := context.WithTimeout(context.Background(), timeoutDuration)
 		defer cancel()
 
 		if err := c.BindJSON(&user); err != nil {

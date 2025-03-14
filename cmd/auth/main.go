@@ -34,6 +34,7 @@ func main() {
 
 	routes.AuthintificateRoute(router)
 	routes.UserManager(router)
+	routes.AdminManager(router)
 
 	addr := fmt.Sprintf("%s:%s", ip, port)
 	log.Printf("Trying to run server on %s...", addr)
