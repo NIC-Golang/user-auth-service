@@ -1,0 +1,24 @@
+services:
+  user-auth-service:
+    build:
+      context: ./src/user-auth-service
+      dockerfile: Dockerfile
+    ports:
+      - ${PORT_AUTH}
+    env_file:
+      - src/user-auth-service/.env
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URL: ${MONGO}
+  
+  mongodb:
+    image: mongo:6
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
