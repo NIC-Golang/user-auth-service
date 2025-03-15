@@ -11,19 +11,19 @@ User authentication and authorization microservice for the e-commerce platform. 
 Clone the repository and set up the environment:  
 
 ```sh
-git clone <your-repo-url>
+git clone https://github.com/NIC-Golang/user-auth-service.git
 cd user-auth-service
 cp .env.example .env
 ```
 ## Available Makefile Commands:
 ```
-make help     Shows the list of commands
-make install	Install missing dependencies (go mod tidy)
-make run	    Run the server
-make stop	    Stop the server
-make restart	Restart the server
-make compile	Compile the application
-make clean	  Clean the cache
+make help           Shows the list of commands
+make install	    Install missing dependencies (go mod tidy)
+make run	        Run the server
+make stop	        Stop the server
+make restart	    Restart the server
+make compile	    Compile the application
+make clean	        Clean the cache
 ```
 
 ## Running the service:
