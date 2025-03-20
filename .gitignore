@@ -1,1 +1,3 @@
 .env
+output.log
+.user-auth-service.pid

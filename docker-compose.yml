@@ -4,13 +4,13 @@ services:
       context: ./src/user-auth-service
       dockerfile: Dockerfile
     ports:
-      - ${PORT_AUTH}
+      - ${AUTH_PORT}
     env_file:
-      - src/user-auth-service/.env
+      - .env
     depends_on:
       - mongodb
     environment:
-      MONGO_URL: ${MONGO}
+      MONGO_URL: ${MONGO_URL}
   
   mongodb:
     image: mongo:6

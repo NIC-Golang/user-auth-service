@@ -82,7 +82,7 @@ func UpdateTokens(token, refreshToken, userId string) error {
 }
 
 func ValidateToken(signedToken string) (claims *SignedDetails, msg string) {
-	err := godotenv.Load("/app/.env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		return nil, fmt.Sprintf("error loading .env file: %v", err)
 	}
