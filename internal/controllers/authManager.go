@@ -7,7 +7,6 @@ import (
 	"go/auth-service/internal/helpers"
 	"go/auth-service/internal/models"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -32,7 +31,7 @@ func SignUp() gin.HandlerFunc {
 		var user models.User
 
 		if err := c.BindJSON(&user); err != nil {
-			c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 		if user.Type == nil || *user.Type == "" {
@@ -46,15 +45,16 @@ func SignUp() gin.HandlerFunc {
 		}
 		userType := "USER"
 		localzone, _ := time.LoadLocation("Asia/Almaty")
-		token, refreshToken, err := helpers.CreateToken(*user.Email, *user.Name, *user.Type, user.User_id)
+		userId := primitive.NewObjectID().Hex()
+		token, refreshToken, err := helpers.CreateToken(*user.Email, *user.Name, *user.Type, userId)
 		if err != nil {
-			log.Fatal(err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create token: " + err.Error()})
 			return
 		}
 		hashedPass := helpers.HashPassword(*user.Password)
 		newUser := models.User{
 			ID:           primitive.NewObjectID(),
-			User_id:      primitive.NewObjectID().Hex(),
+			User_id:      userId,
 			Name:         user.Name,
 			Email:        user.Email,
 			Phone:        user.Phone,
@@ -140,4 +140,33 @@ func Login() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, foundUser)
 	}
+}
+
+func AdminCreatingWithContext(ctx context.Context, name, email, password, phone *string) error {
+	typeAdmin := "ADMIN"
+	hashedPass := helpers.HashPassword(*password)
+	userId := primitive.NewObjectID().Hex()
+	token, refreshToken, err := helpers.CreateToken(*email, *name, "ADMIN", userId)
+	if err != nil {
+		return err
+	}
+	localzone, _ := time.LoadLocation("Asia/Almaty")
+	admin := &models.User{
+		ID:           primitive.NewObjectID(),
+		User_id:      userId,
+		Name:         name,
+		Email:        email,
+		Password:     &hashedPass,
+		Phone:        phone,
+		Token:        token,
+		RefreshToken: refreshToken,
+		Type:         &typeAdmin,
+		Created_at:   time.Now().In(localzone),
+		Updated_at:   time.Now().In(localzone),
+	}
+	_, err = userCollection.InsertOne(ctx, admin)
+	if err != nil {
+		return err
+	}
+	return nil
 }

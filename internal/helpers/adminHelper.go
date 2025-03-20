@@ -4,11 +4,14 @@ import (
 	"context"
 	"fmt"
 	"go/auth-service/internal/models"
+	"net/http"
 	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
+
+const contextTime = time.Second * 10
 
 func TokenTaking(authHeader string) (string, error) {
 	token := strings.TrimPrefix(authHeader, "Bearer ")
@@ -34,7 +37,7 @@ func CheckAdmin(authHeader string) error {
 }
 
 func UpdateMongo(id, usertype string) (*models.User, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	ctx, cancel := context.WithTimeout(context.Background(), contextTime)
 	defer cancel()
 
 	update := bson.M{"$set": bson.M{"type": usertype}}
@@ -63,4 +66,30 @@ func UpdateMongo(id, usertype string) (*models.User, error) {
 	}
 
 	return &updatedUser, nil
+}
+
+var httpClient = &http.Client{}
+
+func SendToNotifier(name, email, phone string) error {
+	jsonData := strings.NewReader(fmt.Sprintf(`{"name": "%s", "email": "%s", "phone": "%s"}`, name, email, phone))
+	ctx, cancel := context.WithTimeout(context.Background(), contextTime)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, "POST", "http://notifier-service:8082/admin", jsonData)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to send notification, status code: %d", resp.StatusCode)
+	}
+
+	return nil
 }

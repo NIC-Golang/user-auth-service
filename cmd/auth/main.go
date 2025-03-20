@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"go/auth-service/internal/controllers"
 	"go/auth-service/internal/routes"
 
 	"github.com/gin-gonic/gin"
@@ -30,6 +31,10 @@ func main() {
 
 	if err := router.SetTrustedProxies([]string{ip}); err != nil {
 		log.Fatal("Failed to set trusted proxies:", err)
+	}
+	err := controllers.AdminPresence()
+	if err != nil {
+		fmt.Print(err)
 	}
 
 	routes.AuthintificateRoute(router)
