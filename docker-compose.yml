@@ -1,12 +1,12 @@
 services:
   user-auth-service:
     build:
-      context: ./src/user-auth-service
+      context: .
       dockerfile: Dockerfile
     ports:
       - ${AUTH_PORT}
     env_file:
-      - .env
+      - ./.env
     depends_on:
       - mongodb
     environment:
